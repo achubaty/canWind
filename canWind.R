@@ -1,11 +1,8 @@
-
-# Everything in this file gets sourced during simInit, and all functions and objects
-# are put into the simList. To use objects and functions, use sim$xxx.
 defineModule(sim, list(
   name = "canWind",
   description = "Simulate mean annual wind speeds/directions by generating random directions (biased eastward).",
   keywords = c("insert key words here"),
-  authors = person(c("Alex", "M"), "Chubaty", email = "alexander.chubaty@canada.ca", role = c("aut", "cre")),
+  authors = person(c("Alex", "M"), "Chubaty", email = "achubaty@for-cast.ca", role = c("aut", "cre")),
   childModules = character(0),
   version = numeric_version("0.0.1"),
   spatialExtent = raster::extent(rep(NA_real_, 4)),
@@ -40,7 +37,7 @@ doEvent.canWind <- function(sim, eventTime, eventType, debug = FALSE) {
     "init" = {
       # do stuff for this event
       sim <- sim$canWindInit(sim)
-  
+
       # schedule future event(s)
       sim <- scheduleEvent(sim, P(sim)$.plotInitialTime, "canWind", "plot")
     },
@@ -48,10 +45,10 @@ doEvent.canWind <- function(sim, eventTime, eventType, debug = FALSE) {
       # ! ----- EDIT BELOW ----- ! #
       # do stuff for this event
       Plot(sim$windMap)
-      
+
       # schedule future event(s)
       sim <- scheduleEvent(sim, time(sim) + P(sim)$.plotInterval, "canWind", "plot")
-  
+
       # ! ----- STOP EDITING ----- ! #
     },
     warning(paste("Undefined event type: '", current(sim)[1, "eventType", with = FALSE],
@@ -78,7 +75,7 @@ doEvent.canWind <- function(sim, eventTime, eventType, debug = FALSE) {
   if (!('studyArea' %in% sim$.userSuppliedObjNames)) {
     load(file.path(modulePath(sim), "canWind", "data", "west.boreal.RData"), envir = envir(sim))
   }
-  
+
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
 }
@@ -91,7 +88,7 @@ doEvent.canWind <- function(sim, eventTime, eventType, debug = FALSE) {
 ### template initialization
 canWindInit <- function(sim) {
   # # ! ----- EDIT BELOW ----- ! #
-  
+
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
 }
