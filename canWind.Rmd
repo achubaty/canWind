@@ -1,12 +1,117 @@
 ---
 title: "canWind"
-author: "Alex M. Chubaty"
-date: "01 December 2017"
-output: pdf_document
+author: "Alex M. Chubaty <achubaty@for-cast.ca>"
+date: "01 June 2021"
+output: 
+  html_document: 
+    keep_md: yes
+editor_options:
+  chunk_output_type: console
 ---
 
-### `canWind`
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.path = "figures/",
+                      message = FALSE, results = "hold")
+```
 
-Import/use wind projections from BioSim to be used with `mpbRedTopSpread` module.
+```{r packages}
+if (!require("BioSIM")) {
+  ## package BioSIM not available on CRAN nor GitHub; needs to be installed as follows:
+  install.packages("https://sourceforge.net/projects/repiceasource/files/latest",
+                   repos = NULL,  type = "source")
+  install.packages("https://sourceforge.net/projects/biosimclient.mrnfforesttools.p/files/latest",
+                   repos = NULL,  type = "source")
+}
 
-Not yet implemented. Currently a stub.
+library("Require")
+Require(c(
+  "PredictiveEcology/reproducible@development",
+  "PredictiveEcology/SpaDES.core@development"#,
+  #"PredictiveEcology/LandR@development"
+))
+```
+
+# Overview
+
+Import/use wind projections from BioSIM.
+
+# Usage
+
+```{r module_usage}
+scratchDir <- checkPath("~/scratch/canWind", create = TRUE)
+
+raster::rasterOptions(default = TRUE)
+options(
+  rasterMaxMemory = 5e+12,
+  rasterTmpDir = scratchDir,
+  reproducible.cacheSaveFormat = "qs"
+)
+
+setPaths(
+  cachePath = checkPath(file.path(scratchDir, "cache"), create = TRUE),
+  modulePath = file.path(".."),
+  inputPath = "data",
+  outputPath = "outputs"
+)
+
+times <- list(start = 2010, end = 2013)
+
+parameters <- list(
+  canWind = list(
+    climateModel = "GCM4",
+    climateScenario = "RCP45",
+    .plotInitialTime = times$start,
+    .plotInterval = NA,
+    .tempdir = scratchDir,
+    years = seq(times$start, times$end, 1)
+  )
+)
+modules <- list("canWind")
+objects <- list()
+inputs <- list()
+outputs <- list()
+
+mySimOut <- simInitAndSpades(times = times, params = parameters, modules = modules, objects = objects)
+
+J4R::shutdownClient()
+```
+
+# Parameters
+
+Provide a summary of user-visible parameters.
+
+```{r moduleParams, echo = FALSE, eval = TRUE}
+df_params <- SpaDES.core::moduleParams("canWind", "..")
+knitr::kable(df_params)
+```
+
+# Events
+
+Describe what happens for each event type.
+
+## Init
+
+TODO
+
+## Input data
+
+How to obtain input data, and a description of the data required by the module.
+If `sourceURL` is specified, `downloadData("canWind", "..")` may be sufficient.
+
+```{r moduleInputs, echo = FALSE, eval = TRUE}
+df_inputs <- SpaDES.core::moduleInputs("canWind", "..")
+knitr::kable(df_inputs)
+```
+
+## Output data
+
+Description of the module outputs.
+
+```{r moduleOutputs, echo = FALSE, eval = TRUE}
+df_outputs <- SpaDES.core::moduleOutputs("canWind", "..")
+knitr::kable(df_outputs)
+```
+
+# Links to other modules
+
+This module prepares data layers for use with MPB red top spread module (<https://github.com/achubaty/mpbRedTopSpread>).
